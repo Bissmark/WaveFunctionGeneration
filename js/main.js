@@ -10,6 +10,8 @@ const state = {
             0, 0, 0, 0, 0, 0, 0, 0, 0 ]
 }
 
+let selectedCell = null;
+
 const init = () => {
     renderBoard();
     renderNumPad();
@@ -18,19 +20,15 @@ const init = () => {
 const renderBoard = () => {
     const board = document.getElementById('board')
     board.innerHTML = '';
-    for (let i = 0; i < state.board.length; i++) {
-        const cell = document.createElement('div')
-        cell.className = 'cell';
-        cell.innerHTML = '';
-        cell.addEventListener('click', () => {
-            console.log(state.board[i])
-            if (state.board[i] === 0) {
-                state.board[i] = keyboardNumberInput();
-                renderBoard();
-            }
+    state.board.forEach((cell, index) => {
+        const cellElement = document.createElement('div');
+        cellElement.className = 'cell';
+        cellElement.innerHTML = cell === 0 ? '' : cell;
+        cellElement.addEventListener('click', () => {
+            selectedCell = index;
         })
-        board.appendChild(cell);
-    }
+        board.appendChild(cellElement);
+    });
 }
 
 const renderNumPad = () => {
@@ -41,24 +39,12 @@ const renderNumPad = () => {
         button.className = 'numPadButton';
         button.innerHTML = i;
         button.addEventListener('click', () => {
-            const index = state.board.indexOf(0)
-            if (index !== -1) {
-                state.board[index] = i
+            if (selectedCell !== null) {
+                state.board[selectedCell] = i;
                 renderBoard();
             }
         })
         numPad.appendChild(button);
-    }
-}
-
-const keyboardNumberInput = (event) => {
-    const number = event.key
-    if (number >= 1 && number <= 9) {
-        const index = state.board.indexOf(0)
-        if (index !== -1) {
-            state.board[index] = parseInt(number)
-            renderBoard()
-        }
     }
 }
 
