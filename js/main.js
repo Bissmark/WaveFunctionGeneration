@@ -33,30 +33,42 @@ const renderBoard = () => {
 }
 
 const fillBoard = () => {
-    for (let i = 0; i < 81; i++) {
-        if (state.board[i] === 0) {
+    let emptyCells = findEmptyCells(); // Find all empty cells initially
+    let attempts = 0; // Track the number of attempts
+    const maxAttempts = 30000; // Maximum attempts before breaking out of the loop
+    while (emptyCells.length > 0 && attempts < maxAttempts) { // Continue filling until there are no empty cells or max attempts reached
+        attempts++;
+        emptyCells.forEach(cellIndex => {
             const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
             shuffle(numbers); // Shuffle the numbers 1-9
             let numberFound = false;
-            const row = Math.floor(i / 9); // Calculate the row index
-            const column = i % 9; // Calculate the column index
+            const row = Math.floor(cellIndex / 9); // Calculate the row index
+            const column = cellIndex % 9; // Calculate the column index
             for (const number of numbers) {
-                if (isRowValid(row, number) && isColumnValid(column, number))  {
-                    //console.log(i);
-                    state.board[i] = number; // Update the correct cell
+                if (isRowValid(row, number) && isColumnValid(column, number) && isBoxValid(cellIndex, number))  {
+                    state.board[cellIndex] = number; // Update the correct cell
                     numberFound = true;
-                    //break; // Break out of the loop after finding a valid number
-                } else {
-                    console.log('not valid')
+                    break; // Break out of the loop after finding a valid number
                 }
             }
             if (!numberFound) {
-                state.board[i] = 0; // Reset the cell to 0 if no valid number is found
+                state.board[cellIndex] = 0; // Reset the cell to 0 if no valid number is found
             }
-        }
+        });
+        emptyCells = findEmptyCells(); // Update the list of empty cells
     }
 }
 
+
+const findEmptyCells = () => {
+    const emptyCells = [];
+    state.board.forEach((cell, index) => {
+        if (cell === 0) {
+            emptyCells.push(index);
+        }
+    });
+    return emptyCells;
+}
 
 // Function to shuffle an array using the Fisher-Yates algorithm
 const shuffle = (array) => {
@@ -94,15 +106,16 @@ const isRowValid = (rowIndex, number) => {
 };
 
 
-const isColumnValid = (cellIndex, number) => {
-    const column = cellIndex % 9;
-    for (let i = column; i < 81; i += 9) {
-        if (state.board[i] === number) {
+const isColumnValid = (columnIndex, number) => {
+    for (let i = 0; i < 9; i++) {
+        const cellIndex = columnIndex + i * 9;
+        if (state.board[cellIndex] === number) {
             return false;
         }
     }
     return true;
 };
+
 
 
 const isBoxValid = (cellIndex, number) => {
