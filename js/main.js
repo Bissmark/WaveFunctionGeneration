@@ -38,11 +38,16 @@ const fillBoard = () => {
             const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
             shuffle(numbers); // Shuffle the numbers 1-9
             let numberFound = false;
+            const row = Math.floor(i / 9); // Calculate the row index
+            const column = i % 9; // Calculate the column index
             for (const number of numbers) {
-                if (isRowValid(Math.floor(i / 9), number) && isColumnValid(i % 9, number) && isBoxValid(Math.floor(i / 27) * 3 + Math.floor((i % 9) / 3), number)) {
-                    state.board[i] = number;
+                if (isRowValid(row, number) && isColumnValid(column, number))  {
+                    //console.log(i);
+                    state.board[i] = number; // Update the correct cell
                     numberFound = true;
-                    break; // Break out of the loop after finding a valid number
+                    //break; // Break out of the loop after finding a valid number
+                } else {
+                    console.log('not valid')
                 }
             }
             if (!numberFound) {
@@ -51,6 +56,7 @@ const fillBoard = () => {
         }
     }
 }
+
 
 // Function to shuffle an array using the Fisher-Yates algorithm
 const shuffle = (array) => {
@@ -77,15 +83,16 @@ const renderNumPad = () => {
     }
 }
 
-const isRowValid = (cellIndex, number) => {
-    const row = Math.floor(cellIndex / 9);
-    for (let i = row * 9; i < (row + 1) * 9; i++) {
-        if (state.board[i] === number) {
+const isRowValid = (rowIndex, number) => {
+    for (let i = 0; i < 9; i++) {
+        const cellIndex = rowIndex * 9 + i;
+        if (state.board[cellIndex] === number) {
             return false;
         }
     }
     return true;
 };
+
 
 const isColumnValid = (cellIndex, number) => {
     const column = cellIndex % 9;
@@ -96,6 +103,7 @@ const isColumnValid = (cellIndex, number) => {
     }
     return true;
 };
+
 
 const isBoxValid = (cellIndex, number) => {
     const startRow = Math.floor(cellIndex / 27) * 3;
